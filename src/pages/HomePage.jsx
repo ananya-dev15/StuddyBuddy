@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import VideoTracker from "../components/VideoTracker";
 import AssignmentCard from "../components/AssignmentCard";
+import profileIcon from '../assets/profile_icon.png';
 
-// Chatbot component with predefined buttons
+
+// ------------------- Chatbot Component -------------------
 const Chatbot = () => {
   const [messages, setMessages] = useState([
     { sender: "bot", text: "Hi! I’m StudyBuddy AI 🤖. How can I help you today?" },
@@ -22,11 +24,9 @@ const Chatbot = () => {
   const sendMessage = (text) => {
     if (!text.trim()) return;
     setMessages((prev) => [...prev, { sender: "user", text }]);
-
     let response =
       responses[text.toLowerCase()] ||
       "I’m not sure about that. Try asking about reminders, videos, or analytics.";
-
     setTimeout(() => {
       setMessages((prev) => [...prev, { sender: "bot", text: response }]);
     }, 500);
@@ -39,6 +39,7 @@ const Chatbot = () => {
 
   return (
     <div className="flex flex-col h-full">
+      {/* Messages */}
       <div className="flex-1 overflow-y-auto p-3 space-y-2">
         {messages.map((m, idx) => (
           <div
@@ -69,6 +70,7 @@ const Chatbot = () => {
         )}
       </div>
 
+      {/* Input field */}
       <div className="flex border-t p-2">
         <input
           type="text"
@@ -88,8 +90,16 @@ const Chatbot = () => {
   );
 };
 
+// ------------------- HomePage Component -------------------
 const HomePage = () => {
   const [chatOpen, setChatOpen] = useState(false);
+  const [user, setUser] = useState(null);
+
+  // Check if user is logged in
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (storedUser) setUser(storedUser);
+  }, []);
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-indigo-100 via-purple-200 to-pink-100 relative overflow-hidden text-gray-800">
@@ -121,48 +131,43 @@ const HomePage = () => {
         </Link>
 
         <div className="hidden md:flex gap-8 font-medium">
-          <Link
-            to="/dashboard"
-            className="hover:text-pink-500 transition-colors duration-300"
-          >
-            Dashboard
-          </Link>
+          <Link to="/dashboard" className="hover:text-pink-500 transition-colors duration-300">Dashboard</Link>
           <button
-            onClick={() =>
-              document.getElementById("about")?.scrollIntoView({ behavior: "smooth" })
-            }
+            onClick={() => document.getElementById("about")?.scrollIntoView({ behavior: "smooth" })}
             className="hover:text-pink-500 transition-colors duration-300"
           >
             About Us
           </button>
-          <Link
-            to="/blogs"
-            className="hover:text-pink-500 transition-colors duration-300"
-          >
-            Blogs
-          </Link>
-          <Link
-            to="/contactus"
-            className="hover:text-pink-500 transition-colors duration-300"
-          >
-            Contact Us
-          </Link>
+          <Link to="/blogs" className="hover:text-pink-500 transition-colors duration-300">Blogs</Link>
+          <Link to="/contactus" className="hover:text-pink-500 transition-colors duration-300">Contact Us</Link>
         </div>
 
-        <div className="flex gap-3">
-          <Link
-            to="/login"
-            className="px-4 py-2 border border-indigo-700 text-indigo-700 rounded-lg hover:bg-indigo-50 transition-all duration-300"
-          >
-            Login
-          </Link>
-          <Link
-            to="/register"
-            className="px-4 py-2 bg-gradient-to-r from-indigo-700 to-pink-600 text-white rounded-lg shadow-xl hover:shadow-2xl hover:scale-105 transform transition-all duration-300"
-          >
-            Sign Up
-          </Link>
-        </div>
+        {/* Conditional Navbar */}
+        {user ? (
+          <div className="flex items-center gap-3">
+            <img
+              src={user.profileImage || profileIcon}
+              alt="Profile"
+              className="w-10 h-10 rounded-full border-2 border-indigo-700"
+            />
+            <span className="font-semibold text-gray-900">{user.name}</span>
+          </div>
+        ) : (
+          <div className="flex gap-3">
+            <Link
+              to="/login"
+              className="px-4 py-2 border border-indigo-700 text-indigo-700 rounded-lg hover:bg-indigo-50 transition-all duration-300"
+            >
+              Login
+            </Link>
+            <Link
+              to="/register"
+              className="px-4 py-2 bg-gradient-to-r from-indigo-700 to-pink-600 text-white rounded-lg shadow-xl hover:shadow-2xl hover:scale-105 transform transition-all duration-300"
+            >
+              Sign Up
+            </Link>
+          </div>
+        )}
       </nav>
 
       {/* Hero Section */}
@@ -196,7 +201,8 @@ const HomePage = () => {
       {/* Features Section */}
       <section className="py-20 bg-white/50 backdrop-blur-lg relative z-10">
         <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-3 gap-10 text-center">
-          {[{ icon: "🎥", title: "Video Tracker", desc: "Log study videos and monitor progress effortlessly.", link: "/videos" },
+          {[
+            { icon: "🎥", title: "Video Tracker", desc: "Log study videos and monitor progress effortlessly.", link: "/videos" },
             { icon: "⏰", title: "Smart Reminders", desc: "Never miss a session with intelligent notifications.", link: "/reminders" },
             { icon: "🤖", title: "AI Chatbot", desc: "Instant help, Q&A, and motivation while studying.", link: "/chatbot" },
             { icon: "📊", title: "Analytics", desc: "Visualize your learning trends and stay consistent.", link: "/analytics" },
@@ -223,7 +229,8 @@ const HomePage = () => {
           Join thousands of students who boosted their productivity with StudyBuddy.
         </p>
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto px-6">
-          {[{ name: "Ananya", role: "CS Student", review: "Reminders keep me punctual and streaks keep me motivated. It’s addictive in a good way!" },
+          {[
+            { name: "Ananya", role: "CS Student", review: "Reminders keep me punctual and streaks keep me motivated. It’s addictive in a good way!" },
             { name: "Raj", role: "Engineering Student", review: "The AI Chatbot is my study buddy at 2 AM. Never thought an app could help this much." },
             { name: "Priya", role: "MBA Student", review: "Analytics make me realize how consistent I’ve been. It’s like fitness tracking, but for studying." },
           ].map((r, idx) => (
@@ -245,14 +252,12 @@ const HomePage = () => {
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-8">Frequently Asked Questions</h2>
           <div className="space-y-6 text-left">
-            {[{ q: "Is StudyBuddy free to use?", a: "Yes! StudyBuddy offers a free plan with core features. You can upgrade for advanced analytics and AI tools." },
+            {[
+              { q: "Is StudyBuddy free to use?", a: "Yes! StudyBuddy offers a free plan with core features. You can upgrade for advanced analytics and AI tools." },
               { q: "Can I use it on mobile?", a: "Absolutely. StudyBuddy is fully responsive and works on all devices." },
               { q: "How does streak tracking work?", a: "Each day you log study sessions, your streak grows. Miss a day, and it resets — motivating you to stay consistent." },
             ].map((f, idx) => (
-              <div
-                key={idx}
-                className="border-b pb-4 bg-white/20 backdrop-blur-lg rounded-xl p-4"
-              >
+              <div key={idx} className="border-b pb-4 bg-white/20 backdrop-blur-lg rounded-xl p-4">
                 <h3 className="font-semibold text-lg text-gray-900">{f.q}</h3>
                 <p className="text-gray-800 mt-2">{f.a}</p>
               </div>
@@ -302,10 +307,7 @@ const HomePage = () => {
       </section>
 
       {/* About Us Section */}
-      <section
-        id="about"
-        className="py-16 text-center bg-white/50 backdrop-blur-lg relative z-10"
-      >
+      <section id="about" className="py-16 text-center bg-white/50 backdrop-blur-lg relative z-10">
         <h2 className="text-3xl font-bold text-gray-900">ABOUT US</h2>
         <p className="mt-3 text-gray-800 max-w-2xl mx-auto">
           We are a passionate team dedicated to making self-learning more effective and engaging.  
@@ -315,53 +317,28 @@ const HomePage = () => {
 
         {/* Team Grid */}
         <div className="mt-10 grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 max-w-7xl mx-auto px-6">
-          {/* Team Member 1 */}
           <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition">
-            <img
-              src="https://via.placeholder.com/150"
-              alt="Team Member"
-              className="w-24 h-24 mx-auto rounded-full border-4 border-indigo-600 shadow-md"
-            />
+            <img src="https://via.placeholder.com/150" alt="Team Member" className="w-24 h-24 mx-auto rounded-full border-4 border-indigo-600 shadow-md"/>
             <h3 className="mt-4 text-xl font-semibold text-gray-900">Ananya Srivastava</h3>
             <p className="text-gray-600 text-sm">Founder & Developer</p>
           </div>
-          {/* Team Member 2 */}
           <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition">
-            <img
-              src="https://via.placeholder.com/150"
-              alt="Team Member"
-              className="w-24 h-24 mx-auto rounded-full border-4 border-indigo-600 shadow-md"
-            />
+            <img src="https://via.placeholder.com/150" alt="Team Member" className="w-24 h-24 mx-auto rounded-full border-4 border-indigo-600 shadow-md"/>
             <h3 className="mt-4 text-xl font-semibold text-gray-900">Anshika Jain</h3>
             <p className="text-gray-600 text-sm">UI/UX Designer</p>
           </div>
-          {/* Team Member 3 */}
           <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition">
-            <img
-              src="https://via.placeholder.com/150"
-              alt="Team Member"
-              className="w-24 h-24 mx-auto rounded-full border-4 border-indigo-600 shadow-md"
-            />
+            <img src="https://via.placeholder.com/150" alt="Team Member" className="w-24 h-24 mx-auto rounded-full border-4 border-indigo-600 shadow-md"/>
             <h3 className="mt-4 text-xl font-semibold text-gray-900">Ankit Kumar</h3>
             <p className="text-gray-600 text-sm">AI/ML Specialist</p>
           </div>
-          {/* Team Member 4 */}
           <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition">
-            <img
-              src="https://via.placeholder.com/150"
-              alt="Team Member"
-              className="w-24 h-24 mx-auto rounded-full border-4 border-indigo-600 shadow-md"
-            />
+            <img src="https://via.placeholder.com/150" alt="Team Member" className="w-24 h-24 mx-auto rounded-full border-4 border-indigo-600 shadow-md"/>
             <h3 className="mt-4 text-xl font-semibold text-gray-900">Setu Arya</h3>
             <p className="text-gray-600 text-sm">Backend Engineer</p>
           </div>
-          {/* Team Member 5 */}
           <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition">
-            <img
-              src="https://via.placeholder.com/150"
-              alt="Team Member"
-              className="w-24 h-24 mx-auto rounded-full border-4 border-indigo-600 shadow-md"
-            />
+            <img src="https://via.placeholder.com/150" alt="Team Member" className="w-24 h-24 mx-auto rounded-full border-4 border-indigo-600 shadow-md"/>
             <h3 className="mt-4 text-xl font-semibold text-gray-900">Yash Jain</h3>
             <p className="text-gray-600 text-sm">Content Strategist</p>
           </div>
@@ -378,61 +355,25 @@ const HomePage = () => {
           <div>
             <h4 className="font-semibold mb-3 text-white">Product</h4>
             <ul className="space-y-2 text-sm">
-              <li>
-                <Link to="/reminders" className="hover:text-white">
-                  Reminders
-                </Link>
-              </li>
-              <li>
-                <Link to="/assignments" className="hover:text-white">
-                  Assignments
-                </Link>
-              </li>
-              <li>
-                <Link to="/analytics" className="hover:text-white">
-                  Analytics
-                </Link>
-              </li>
+              <li><Link to="/reminders" className="hover:text-white">Reminders</Link></li>
+              <li><Link to="/assignments" className="hover:text-white">Assignments</Link></li>
+              <li><Link to="/analytics" className="hover:text-white">Analytics</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="font-semibold mb-3 text-white">Company</h4>
             <ul className="space-y-2 text-sm">
-              <li>
-                <Link to="/about" className="hover:text-white">
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link to="/contact" className="hover:text-white">
-                  Contact
-                </Link>
-              </li>
-              <li>
-                <Link to="/careers" className="hover:text-white">
-                  Careers
-                </Link>
-              </li>
+              <li><Link to="/about" className="hover:text-white">About Us</Link></li>
+              <li><Link to="/contact" className="hover:text-white">Contact</Link></li>
+              <li><Link to="/careers" className="hover:text-white">Careers</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="font-semibold mb-3 text-white">Follow Us</h4>
             <ul className="space-y-2 text-sm">
-              <li>
-                <a href="#" className="hover:text-white">
-                  Twitter
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white">
-                  LinkedIn
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white">
-                  Instagram
-                </a>
-              </li>
+              <li><a href="#" className="hover:text-white">Twitter</a></li>
+              <li><a href="#" className="hover:text-white">LinkedIn</a></li>
+              <li><a href="#" className="hover:text-white">Instagram</a></li>
             </ul>
           </div>
         </div>
@@ -447,12 +388,7 @@ const HomePage = () => {
           <div className="mb-2 w-80 h-96 bg-white shadow-2xl rounded-xl overflow-hidden">
             <div className="bg-indigo-700 text-white p-3 font-semibold flex justify-between items-center">
               Chat with AI
-              <button
-                onClick={() => setChatOpen(false)}
-                className="ml-2 font-bold"
-              >
-                ✕
-              </button>
+              <button onClick={() => setChatOpen(false)} className="ml-2 font-bold">✕</button>
             </div>
             <div className="p-3 h-full overflow-y-auto">
               <Chatbot />
@@ -467,6 +403,7 @@ const HomePage = () => {
         </button>
       </div>
 
+      {/* Animation style */}
       <style>{`
         @keyframes pulse {0%,100%{opacity:0.2}50%{opacity:1}}
         .animate-pulse {animation:pulse 3s infinite;}

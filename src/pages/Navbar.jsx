@@ -12,6 +12,7 @@ export default function Navbar() {
         <Link to="/reminders" className="hover:underline">Reminders</Link>
         <Link to="/login" className="hover:underline">Login</Link>
         <Link to="/register" className="hover:underline">Register</Link>
+       
       </div>
     </nav>
   );
